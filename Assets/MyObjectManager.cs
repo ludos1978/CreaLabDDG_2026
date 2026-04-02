@@ -9,11 +9,12 @@ public class MyObjectManager : MonoBehaviour
     List<float> enableTime = new List<float>();
     int currentObjectIndex = 0;
     public GameObject dropPrefab;
+    public GameObject breadcrumbsParent;
 
     void Start() {
         StartCoroutine(DropObject());
         for (int i=0; i<500; i++) {
-            instantiatedObject = Instantiate(dropPrefab, gameObject.transform.position, Quaternion.identity);
+            instantiatedObject = Instantiate(dropPrefab, gameObject.transform.position, Quaternion.identity, breadcrumbsParent.transform);
             instantiatedObject.SetActive(false);
             myObjects.Add(instantiatedObject);
             enableTime.Add(0f);
