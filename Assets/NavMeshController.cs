@@ -15,41 +15,40 @@ public class NavMeshController : MonoBehaviour
     public float startChase = 0.0f;
 
     public enum CHARACTERSTATE {
-      PATROLLING,
-      CHASING,
-      RETURNING
+      PATROLLING_LOOP,
+      CHASING_ENTER,
+      CHASING_LOOP
     }
     public CHARACTERSTATE characterState;
 
     void Start() {
       navMeshAgent.SetDestination(targetObjects[targetIndex].transform.position);
-      characterState = CHARACTERSTATE.PATROLLING;
+      characterState = CHARACTERSTATE.PATROLLING_LOOP;
     }
 
     void Update() {
       switch (characterState) {
-        case CHARACTERSTATE.PATROLLING:
+        case CHARACTERSTATE.PATROLLING_LOOP:
           Debug.Log("Patrolling");
           
           GameObject foundPlayer = FindPlayer();
           if (foundPlayer != null) {
-            characterState = CHARACTERSTATE.CHASING;
+            characterState = CHARACTERSTATE.CHASING_ENTER;
             chaseTargetObject = foundPlayer;
-            navMeshAgent.SetDestination(chaseTargetObject.transform.position);
-            startChase = Time.time;
           }
           GoThere();
           break;
-
-        case CHARACTERSTATE.CHASING:
+        case CHARACTERSTATE.CHASING_ENTER:
+          navMeshAgent.SetDestination(chaseTargetObject.transform.position);
+          startChase = Time.time;
+          characterState = CHARACTERSTATE.CHASING_LOOP;
+          break;
+        case CHARACTERSTATE.CHASING_LOOP:
           Debug.Log("Chasing");
           if ((Time.time - startChase) > 10f) {
-            characterState = CHARACTERSTATE.PATROLLING;
+            characterState = CHARACTERSTATE.PATROLLING_LOOP;
           }
           navMeshAgent.SetDestination(chaseTargetObject.transform.position);
-          break;
-
-        case CHARACTERSTATE.RETURNING:
           break;
       }
     }
