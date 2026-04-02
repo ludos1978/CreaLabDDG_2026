@@ -6,6 +6,7 @@ public class MyObjectManager : MonoBehaviour
 {
 
     List<GameObject> myObjects = new List<GameObject>();
+    List<float> enableTime = new List<float>();
     int currentObjectIndex = 0;
     public GameObject dropPrefab;
 
@@ -15,6 +16,7 @@ public class MyObjectManager : MonoBehaviour
             instantiatedObject = Instantiate(dropPrefab, gameObject.transform.position, Quaternion.identity);
             instantiatedObject.SetActive(false);
             myObjects.Add(instantiatedObject);
+            enableTime.Add(0f);
         }
     }
     GameObject instantiatedObject = null;
@@ -23,8 +25,17 @@ public class MyObjectManager : MonoBehaviour
             yield return new WaitForSeconds(0.03f);
             Debug.Log("Iteration "+Time.time);
             myObjects[currentObjectIndex].SetActive(true);
+            enableTime[currentObjectIndex] = Time.time;
             myObjects[currentObjectIndex].transform.position = gameObject.transform.position;
             currentObjectIndex = (currentObjectIndex + 1) % myObjects.Count;
+
+            if ((Time.frameCount % 10) == 0) {
+                for (int i=0; i<500; i++) {
+                    if ((Time.time - enableTime[i]) > 3f) {
+                        myObjects[i].SetActive(false);
+                    }
+                }
+            }
         }
     }
 }
