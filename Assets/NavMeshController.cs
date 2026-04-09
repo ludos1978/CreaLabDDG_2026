@@ -2,10 +2,16 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
+
+[System.Serializable]
+public class StateEvent {
+  public NavMeshController.CHARACTERSTATE state;
+  public UnityEvent evnt;
+}
 
 public class NavMeshController : MonoBehaviour
 {
-
     public UnityEngine.AI.NavMeshAgent navMeshAgent;
     // public GameObject targetObject;
     public List<GameObject> targetObjects;
@@ -13,6 +19,8 @@ public class NavMeshController : MonoBehaviour
     public GameObject chaseTargetObject;
 
     public float startChase = 0.0f;
+
+    public List<StateEvent> stateMachineEvents;
 
     public enum CHARACTERSTATE {
       PATROLLING_LOOP,
@@ -27,9 +35,15 @@ public class NavMeshController : MonoBehaviour
     }
 
     void Update() {
+      foreach (StateEvent stateEvent in stateMachineEvents) {
+        if (characterState == stateEvent.state) {
+          stateEvent.evnt.Invoke();
+        }
+      }
+      
       switch (characterState) {
         case CHARACTERSTATE.PATROLLING_LOOP:
-          Debug.Log("Patrolling");
+          // Debug.Log("Patrolling");
           
           GameObject foundPlayer = FindPlayer();
           if (foundPlayer != null) {
@@ -44,7 +58,7 @@ public class NavMeshController : MonoBehaviour
           characterState = CHARACTERSTATE.CHASING_LOOP;
           break;
         case CHARACTERSTATE.CHASING_LOOP:
-          Debug.Log("Chasing");
+          // Debug.Log("Chasing");
           if ((Time.time - startChase) > 10f) {
             characterState = CHARACTERSTATE.PATROLLING_LOOP;
           }
