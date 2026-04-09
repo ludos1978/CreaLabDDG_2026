@@ -11,6 +11,8 @@ public class MyObjectManager : MonoBehaviour
     public GameObject dropPrefab;
     public GameObject breadcrumbsParent;
 
+    public GameObject relativeObject;
+
     void Start() {
         StartCoroutine(DropObject());
         for (int i=0; i<500; i++) {
@@ -20,11 +22,21 @@ public class MyObjectManager : MonoBehaviour
             enableTime.Add(0f);
         }
     }
-    GameObject instantiatedObject = null;
+
+  void Update()
+  {
+    Vector3 relativePosition = relativeObject.transform.position - transform.position;
+    Vector3 transformedRelativePosition = transform.InverseTransformVector(relativePosition);
+    float angle = Mathf.Atan2(transformedRelativePosition.x, transformedRelativePosition.z);
+    float distance = new Vector2(transformedRelativePosition.x, transformedRelativePosition.z).magnitude;
+    Debug.Log("A "+angle*Mathf.Rad2Deg+" D "+distance+ " offset "+transformedRelativePosition);
+  }
+
+  GameObject instantiatedObject = null;
     private IEnumerator DropObject() {
         while (true) {
             yield return new WaitForSeconds(0.03f);
-            Debug.Log("Iteration "+Time.time);
+            // Debug.Log("Iteration "+Time.time);
             myObjects[currentObjectIndex].SetActive(true);
             enableTime[currentObjectIndex] = Time.time;
             myObjects[currentObjectIndex].transform.position = gameObject.transform.position;
